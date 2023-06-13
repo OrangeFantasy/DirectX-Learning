@@ -4,15 +4,6 @@
 
 #define WIN32_LEAN_AND_MEAN
 
-// #define NOWINMESSAGES  // - WM_#define, EM_#define, LB_#define, CB_#define
-// #define NOWINSTYLES    // - WS_#define, CS_#define, ES_#define, LBS_#define, SBS_#define, CBS_#define
-// #define NOSHOWWINDOW   // - SW_#define
-// #define NOUSER         // - All USER defines and routines
-// #define NOWINOFFSETS	  // - GWL_#define, GCL_#define, associated routines
-// #define NOMSG          // - typedef MSG and associated routines
-// #define NOMB           // - MB_#define and MessageBox()
-// #define NOVIRTUALKEYCODES  // - VK_#define
-
 #define NOGDICAPMASKS    // - CC_#define, LC_#define, PC_#define, CP_#define, TC_#define, RC_
 #define NOSYSMETRICS     // - SM_#define
 #define NOMENUS          // - MF_#define
