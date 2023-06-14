@@ -1,5 +1,7 @@
 #include "Mouse.h"
 
+#include "OraeWin.h"
+
 std::pair<int, int> Mouse::GetPos() const noexcept
 {
     return {x, y};
@@ -23,6 +25,11 @@ bool Mouse::LeftIsPress() const noexcept
 bool Mouse::RightIsPress() const noexcept
 {
     return rightIsPressed;
+}
+
+bool Mouse::IsInWindow() const noexcept
+{
+    return isInWindow;
 }
 
 Mouse::Event Mouse::Read() noexcept
@@ -94,7 +101,37 @@ void Mouse::OnWheelDown(int x, int y) noexcept
     TrimBuffer();
 }
 
-void Mouse::TrimBuffer() noexcept {
+void Mouse::OnWheelDelta(int x, int y, int delta) noexcept
+{
+    wheelDeltaCarry += delta;
+    while (wheelDeltaCarry >= WHEEL_DELTA)
+    {
+        wheelDeltaCarry -= WHEEL_DELTA;
+        OnWheelUp(x, y);
+    }
+    while (wheelDeltaCarry <= -WHEEL_DELTA)
+    {
+        wheelDeltaCarry += WHEEL_DELTA;
+        OnWheelDown(x, y);
+    }
+}
+
+void Mouse::OnMouseEnterWindow() noexcept
+{
+    isInWindow = true;
+    buffer.push(Mouse::Event(Mouse::Event::Type::EnterWindow, *this));
+    TrimBuffer();
+}
+
+void Mouse::OnMouseLeaveWindow() noexcept
+{
+    isInWindow = false;
+    buffer.push(Mouse::Event(Mouse::Event::Type::LeaveWindow, *this));
+    TrimBuffer();
+}
+
+void Mouse::TrimBuffer() noexcept
+{
     while (buffer.size() > bufferSize)
     {
         buffer.pop();

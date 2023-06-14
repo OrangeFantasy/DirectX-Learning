@@ -4,6 +4,7 @@
 #include "OraeException.h"
 
 #include "Keyboard.h"
+#include "Mouse.h"
 
 #ifdef UNICODE
 using char_t   = wchar_t;
@@ -60,6 +61,8 @@ public:
     Window(const Window&)            = delete;
     Window& operator=(const Window&) = delete;
 
+    void SetTitle(const string_t title);
+
 private:
     static LRESULT WINAPI HandleMsgSetup(_In_ HWND hWnd, _In_ UINT Msg, _In_ WPARAM wParam, _In_ LPARAM lParam) noexcept;
     static LRESULT WINAPI HandleMsgThunk(_In_ HWND hWnd, _In_ UINT Msg, _In_ WPARAM wParam, _In_ LPARAM lParam) noexcept;
@@ -68,6 +71,7 @@ private:
 
 public:
     Keyboard keyboard;
+    Mouse    mouse;
 
 private:
     int  width;

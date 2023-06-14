@@ -79,6 +79,14 @@ Window::~Window()
     DestroyWindow(hWnd);
 }
 
+void Window::SetTitle(const string_t title)
+{
+    if (SetWindowText(hWnd, title.c_str()) == 0)
+    {
+        throw HWND_LAST_EXCEPT();
+    }
+}
+
 LRESULT WINAPI Window::HandleMsgSetup(_In_ HWND hWnd, _In_ UINT Msg, _In_ WPARAM wParam, _In_ LPARAM lParam) noexcept
 {
     // Use create parameter passed in from CreateWindow() to store window class pointer.
@@ -117,6 +125,7 @@ LRESULT Window::HandleMsg(HWND hWnd, UINT Msg, WPARAM wParam, LPARAM lParam) noe
     case WM_CLOSE:
         PostQuitMessage(0);
         return 0;
+
     case WM_KILLFOCUS:
         keyboard.ClearState();
         break;
@@ -134,6 +143,67 @@ LRESULT Window::HandleMsg(HWND hWnd, UINT Msg, WPARAM wParam, LPARAM lParam) noe
     case WM_CHAR:
         keyboard.OnChar(static_cast<unsigned char>(wParam));
         break;
+
+    case WM_MOUSEMOVE:
+    {
+        POINTS pt = MAKEPOINTS(lParam);
+        // In window.
+        if (pt.x >= 0 && pt.x < width && pt.y > 0 && pt.y < height)
+        {
+            mouse.OnMouseMove(pt.x, pt.y);
+            if (!mouse.IsInWindow())
+            {
+                SetCapture(hWnd);
+                mouse.OnMouseEnterWindow();
+            }
+        }
+        // Not in window -> log move/maintain capture if button down.
+        else
+        {
+            if (wParam & (MK_LBUTTON | MK_RBUTTON))
+            {
+                mouse.OnMouseMove(pt.x, pt.y);
+            }
+            else
+            {
+                ReleaseCapture();
+                mouse.OnMouseLeaveWindow();
+            }
+        }
+        break;
+    }
+    case WM_LBUTTONDOWN:
+    {
+        POINTS pt = MAKEPOINTS(lParam);
+        mouse.OnLeftPressed(pt.x, pt.y);
+        break;
+    }
+    case WM_LBUTTONUP:
+    {
+        POINTS pt = MAKEPOINTS(lParam);
+        mouse.OnLeftReleased(pt.x, pt.y);
+        break;
+    }
+    case WM_RBUTTONDOWN:
+    {
+        POINTS pt = MAKEPOINTS(lParam);
+        mouse.OnRightPressed(pt.x, pt.y);
+        break;
+    }
+    case WM_RBUTTONUP:
+    {
+        POINTS pt = MAKEPOINTS(lParam);
+        mouse.OnRightReleased(pt.x, pt.y);
+        break;
+    }
+    case WM_MOUSEWHEEL:
+    {
+        POINTS pt    = MAKEPOINTS(lParam);
+        int    delta = GET_WHEEL_DELTA_WPARAM(wParam);
+        mouse.OnWheelDelta(pt.x, pt.y, delta);
+        break;
+    }
+
     default:
         break;
     }

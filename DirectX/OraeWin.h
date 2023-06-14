@@ -8,7 +8,6 @@
 #define NOSYSMETRICS     // - SM_#define
 #define NOMENUS          // - MF_#define
 #define NOICONS          // - IDI_#define
-#define NOKEYSTATES      // - MK_#define
 #define NOSYSCOMMANDS    // - SC_#define
 #define NORASTEROPS      // - Binary and Tertiary raster ops
 #define OEMRESOURCE      // - OEM Resource values
@@ -17,7 +16,6 @@
 #define NOCOLOR          // - Screen colors
 #define NOCTLMGR         // - Control and Dialog routines
 #define NODRAWTEXT       // - DrawText() and DT_*
-#define NOGDI            // - All GDI defines and routines
 #define NOKERNEL         // - All KERNEL defines and routines
 #define NONLS            // - All NLS defines and routines
 #define NOMEMMGR         // - GMEM_#define, LMEM_#define, GHND, LHND, associated routines

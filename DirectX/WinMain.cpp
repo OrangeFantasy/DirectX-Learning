@@ -24,6 +24,30 @@ int WINAPI WinMain(                   // WinMain
             {
                 MessageBox(nullptr, TEXT("Something happen"), TEXT("key! "), MB_OK);
             }
+            while (!window.mouse.IsEmpty())
+            {
+                Mouse::Event e = window.mouse.Read();
+                switch (e.GetType())
+                {
+                case Mouse::Event::Type::LeaveWindow:
+                    window.SetTitle(L"Leave.");
+                    break;
+                case Mouse::Event::Type::EnterWindow:
+                    window.SetTitle(L"Enter.");
+                    break;
+                case Mouse::Event::Type::WheelUp:
+                    window.SetTitle(L"Up");
+                    break;
+                case Mouse::Event::Type::Move:
+                {
+                    auto title = L"[ " + std::to_wstring(e.GetPosX()) + L", " + std::to_wstring(e.GetPosY()) + L" ]";
+                    window.SetTitle(title);
+                    break;
+                }
+                default:
+                    break;
+                }
+            }
         }
         return (int)msg.wParam;
     }
