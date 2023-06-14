@@ -139,6 +139,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="Keyboard.cpp" />
+    <ClCompile Include="Mouse.cpp" />
     <ClCompile Include="OraeException.cpp" />
     <ClCompile Include="OraeWin.cpp" />
     <ClCompile Include="Window.cpp" />
@@ -146,6 +147,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Keyboard.h" />
+    <ClInclude Include="Mouse.h" />
     <ClInclude Include="OraeException.h" />
     <ClInclude Include="OraeWin.h" />
     <ClInclude Include="resource.h" />
