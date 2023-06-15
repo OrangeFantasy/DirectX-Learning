@@ -138,19 +138,35 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="App.cpp" />
+    <ClCompile Include="Array.cpp" />
+    <ClCompile Include="Direct3DException.cpp" />
+    <ClCompile Include="DxgiInfoManager.cpp" />
+    <ClCompile Include="Graphics.cpp" />
     <ClCompile Include="Keyboard.cpp" />
     <ClCompile Include="Mouse.cpp" />
-    <ClCompile Include="OraeException.cpp" />
+    <ClCompile Include="Exception.cpp" />
+    <ClCompile Include="OraeTimer.cpp" />
     <ClCompile Include="OraeWin.cpp" />
+    <ClCompile Include="String.cpp" />
+    <ClCompile Include="Win32Exception.cpp" />
     <ClCompile Include="Window.cpp" />
     <ClCompile Include="WinMain.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="App.h" />
+    <ClInclude Include="Array.h" />
+    <ClInclude Include="Direct3DException.h" />
+    <ClInclude Include="DxgiInfoManager.h" />
+    <ClInclude Include="Graphics.h" />
     <ClInclude Include="Keyboard.h" />
     <ClInclude Include="Mouse.h" />
-    <ClInclude Include="OraeException.h" />
+    <ClInclude Include="Exception.h" />
+    <ClInclude Include="OraeTimer.h" />
     <ClInclude Include="OraeWin.h" />
     <ClInclude Include="resource.h" />
+    <ClInclude Include="String.h" />
+    <ClInclude Include="Win32Exception.h" />
     <ClInclude Include="Window.h" />
   </ItemGroup>
   <ItemGroup>

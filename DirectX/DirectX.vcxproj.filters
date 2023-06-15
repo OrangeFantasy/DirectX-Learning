@@ -1,57 +1,113 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup>
-    <Filter Include="源文件">
-      <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
-      <Extensions>cpp;c;cc;cxx;c++;cppm;ixx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
-    </Filter>
-    <Filter Include="头文件">
-      <UniqueIdentifier>{93995380-89BD-4b04-88EB-625FBE52EBFB}</UniqueIdentifier>
-      <Extensions>h;hh;hpp;hxx;h++;hm;inl;inc;ipp;xsd</Extensions>
-    </Filter>
     <Filter Include="资源文件">
       <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
       <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
     </Filter>
+    <Filter Include="Source">
+      <UniqueIdentifier>{93995380-89BD-4b04-88EB-625FBE52EBFB}</UniqueIdentifier>
+      <Extensions>h;hh;hpp;hxx;h++;hm;inl;inc;ipp;xsd</Extensions>
+    </Filter>
+    <Filter Include="Source\Containers">
+      <UniqueIdentifier>{d0916dd0-6033-4bef-b95e-d5e45d7ba1bc}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source\Devices">
+      <UniqueIdentifier>{cb4b4c7f-bece-4f01-a41a-f598923296fb}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source\Exceptions">
+      <UniqueIdentifier>{3964d490-2ca6-4c9b-8ff9-fe89c5c60096}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source\Managers">
+      <UniqueIdentifier>{a3e32843-3ee7-4058-ac28-5e4e3bbacbb0}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="WinMain.cpp">
-      <Filter>源文件</Filter>
+      <Filter>Source</Filter>
+    </ClCompile>
+    <ClCompile Include="App.cpp">
+      <Filter>Source</Filter>
     </ClCompile>
     <ClCompile Include="OraeWin.cpp">
-      <Filter>源文件</Filter>
+      <Filter>Source</Filter>
     </ClCompile>
     <ClCompile Include="Window.cpp">
-      <Filter>源文件</Filter>
+      <Filter>Source</Filter>
     </ClCompile>
-    <ClCompile Include="OraeException.cpp">
-      <Filter>源文件</Filter>
+    <ClCompile Include="String.cpp">
+      <Filter>Source\Containers</Filter>
+    </ClCompile>
+    <ClCompile Include="Graphics.cpp">
+      <Filter>Source\Devices</Filter>
     </ClCompile>
     <ClCompile Include="Keyboard.cpp">
-      <Filter>源文件</Filter>
+      <Filter>Source\Devices</Filter>
     </ClCompile>
     <ClCompile Include="Mouse.cpp">
-      <Filter>源文件</Filter>
+      <Filter>Source\Devices</Filter>
+    </ClCompile>
+    <ClCompile Include="Exception.cpp">
+      <Filter>Source\Exceptions</Filter>
+    </ClCompile>
+    <ClCompile Include="Win32Exception.cpp">
+      <Filter>Source\Exceptions</Filter>
+    </ClCompile>
+    <ClCompile Include="DxgiInfoManager.cpp">
+      <Filter>Source\Managers</Filter>
+    </ClCompile>
+    <ClCompile Include="OraeTimer.cpp">
+      <Filter>Source\Managers</Filter>
+    </ClCompile>
+    <ClCompile Include="Array.cpp">
+      <Filter>Source\Containers</Filter>
+    </ClCompile>
+    <ClCompile Include="Direct3DException.cpp">
+      <Filter>Source\Exceptions</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="OraeWin.h">
-      <Filter>头文件</Filter>
+      <Filter>Source</Filter>
     </ClInclude>
     <ClInclude Include="Window.h">
-      <Filter>头文件</Filter>
-    </ClInclude>
-    <ClInclude Include="OraeException.h">
-      <Filter>头文件</Filter>
+      <Filter>Source</Filter>
     </ClInclude>
     <ClInclude Include="resource.h">
-      <Filter>头文件</Filter>
+      <Filter>Source</Filter>
     </ClInclude>
-    <ClInclude Include="Keyboard.h">
-      <Filter>头文件</Filter>
+    <ClInclude Include="App.h">
+      <Filter>Source</Filter>
+    </ClInclude>
+    <ClInclude Include="String.h">
+      <Filter>Source\Containers</Filter>
     </ClInclude>
     <ClInclude Include="Mouse.h">
-      <Filter>头文件</Filter>
+      <Filter>Source\Devices</Filter>
+    </ClInclude>
+    <ClInclude Include="Graphics.h">
+      <Filter>Source\Devices</Filter>
+    </ClInclude>
+    <ClInclude Include="Keyboard.h">
+      <Filter>Source\Devices</Filter>
+    </ClInclude>
+    <ClInclude Include="Exception.h">
+      <Filter>Source\Exceptions</Filter>
+    </ClInclude>
+    <ClInclude Include="Win32Exception.h">
+      <Filter>Source\Exceptions</Filter>
+    </ClInclude>
+    <ClInclude Include="DxgiInfoManager.h">
+      <Filter>Source\Managers</Filter>
+    </ClInclude>
+    <ClInclude Include="OraeTimer.h">
+      <Filter>Source\Managers</Filter>
+    </ClInclude>
+    <ClInclude Include="Array.h">
+      <Filter>Source\Containers</Filter>
+    </ClInclude>
+    <ClInclude Include="Direct3DException.h">
+      <Filter>Source\Exceptions</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

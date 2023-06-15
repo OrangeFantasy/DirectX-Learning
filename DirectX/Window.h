@@ -1,84 +1,62 @@
 #pragma once
 
-#include "OraeWin.h"
-#include "OraeException.h"
+#include <optional>
 
+#include "OraeWin.h"
+#include "Win32Exception.h"
 #include "Keyboard.h"
 #include "Mouse.h"
+#include "Graphics.h"
 
-#ifdef UNICODE
-using char_t   = wchar_t;
-using string_t = std::wstring;
-#elif
-using char_t   = char;
-using string_t = std::string;
-#endif
-
-class Window
+class FWindow
 {
 private:
-    // Exception.
-    class Exception : public OraeException
-    {
-    public:
-        Exception(int line, const char_t* file, HRESULT hResult) noexcept;
-
-        virtual const char_t* What() const noexcept override;
-        virtual const char_t* GetType() const noexcept override;
-
-        HRESULT  GetErrorCode() const noexcept;
-        string_t GetErrorString() const noexcept;
-
-        static string_t TranslateErrorCode(HRESULT hResult);
-
-    private:
-        HRESULT hResult;
-    };
-
     // WindowClass.
-    class WindowClass
+    class FWindowClass
     {
     public:
-        static const char_t* GetName() noexcept;
-        static HINSTANCE     GetInstance() noexcept;
+        static const FChar* GetName() noexcept;
+        static HINSTANCE    GetInstance() noexcept;
 
     private:
-        WindowClass() noexcept;
-        ~WindowClass();
-        WindowClass(const WindowClass&)            = delete;
-        WindowClass& operator=(const WindowClass&) = delete;
+        FWindowClass() noexcept;
+        ~FWindowClass();
+        FWindowClass(const FWindowClass&)            = delete;
+        FWindowClass& operator=(const FWindowClass&) = delete;
 
     private:
-        static constexpr const char_t* wndClassName = TEXT("Direct3D Window");
-        static WindowClass             wndClass;
+        static constexpr const FChar* WindowClassName = TEXT("DirectX3D Window");
+        static FWindowClass WindowClass;
 
-        HINSTANCE hInstance;
+        HINSTANCE Instance;
     };
 
 public:
-    Window(int nWidth, int nHeight, const char_t* wndName);
-    ~Window();
-    Window(const Window&)            = delete;
-    Window& operator=(const Window&) = delete;
+    FWindow(int32_t Width, int32_t Height, const FChar* wndName);
+    FWindow(const FWindow&)            = delete;
+    FWindow& operator=(const FWindow&) = delete;
+    ~FWindow();
 
-    void SetTitle(const string_t title);
+    static std::optional<int32_t> ProcessMessages();
+
+    void SetTitle(const FString Title);
+
+    FGraphics& Graphics();
 
 private:
-    static LRESULT WINAPI HandleMsgSetup(_In_ HWND hWnd, _In_ UINT Msg, _In_ WPARAM wParam, _In_ LPARAM lParam) noexcept;
-    static LRESULT WINAPI HandleMsgThunk(_In_ HWND hWnd, _In_ UINT Msg, _In_ WPARAM wParam, _In_ LPARAM lParam) noexcept;
+    static LRESULT WINAPI HandleMsgSetup(_In_ HWND HWnd, _In_ UINT Msg, _In_ WPARAM WParam, _In_ LPARAM LParam) noexcept;
+    static LRESULT WINAPI HandleMsgThunk(_In_ HWND HWnd, _In_ UINT Msg, _In_ WPARAM WParam, _In_ LPARAM LParam) noexcept;
 
-    LRESULT HandleMsg(HWND hWnd, UINT Msg, WPARAM wParam, LPARAM lParam) noexcept;
+    LRESULT HandleMsg(HWND WindowHandle, UINT Msg, WPARAM wParam, LPARAM lParam) noexcept;
 
 public:
-    Keyboard keyboard;
-    Mouse    mouse;
+    FKeyboard Keyboard;
+    FMouse    Mouse;
 
 private:
-    int  width;
-    int  height;
-    HWND hWnd;
-};
+    int32_t Width;
+    int32_t Height;
+    HWND WindowHandle;
 
-// Error exception macro.
-#define HWND_EXCEPT(hResult) Window::Exception(__LINE__, TEXT(__FILE__), hResult)
-#define HWND_LAST_EXCEPT() Window::Exception(__LINE__, TEXT(__FILE__), GetLastError())
+    FGraphics* GraphicsPtr = nullptr;
+};

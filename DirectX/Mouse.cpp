@@ -2,138 +2,138 @@
 
 #include "OraeWin.h"
 
-std::pair<int, int> Mouse::GetPos() const noexcept
+std::pair<int32_t, int32_t> FMouse::GetPos() const noexcept
 {
-    return {x, y};
+    return {X, Y};
 }
 
-int Mouse::GetPosX() const noexcept
+int32_t FMouse::GetPosX() const noexcept
 {
-    return x;
+    return X;
 }
 
-int Mouse::GetPosY() const noexcept
+int32_t FMouse::GetPosY() const noexcept
 {
-    return y;
+    return Y;
 }
 
-bool Mouse::LeftIsPress() const noexcept
+bool FMouse::LeftIsPress() const noexcept
 {
-    return leftIsPressed;
+    return bLeftIsPressed;
 }
 
-bool Mouse::RightIsPress() const noexcept
+bool FMouse::RightIsPress() const noexcept
 {
-    return rightIsPressed;
+    return bRightIsPressed;
 }
 
-bool Mouse::IsInWindow() const noexcept
+bool FMouse::IsInWindow() const noexcept
 {
-    return isInWindow;
+    return bIsInWindow;
 }
 
-Mouse::Event Mouse::Read() noexcept
+FMouse::FEvent FMouse::Read() noexcept
 {
-    if (buffer.size() > 0U)
+    if (EventBuffer.size() > 0U)
     {
-        Event e = buffer.front();
-        buffer.pop();
-        return e;
+        FEvent Event = EventBuffer.front();
+        EventBuffer.pop();
+        return Event;
     }
-    return Event();
+    return FEvent();
 }
 
-bool Mouse::IsEmpty() const noexcept
+bool FMouse::IsEmpty() const noexcept
 {
-    return buffer.empty();
+    return EventBuffer.empty();
 }
 
-void Mouse::Flush() noexcept
+void FMouse::Flush() noexcept
 {
-    buffer = std::queue<Event>();
+    EventBuffer = std::queue<FEvent>();
 }
 
-void Mouse::OnMouseMove(int newX, int newY) noexcept
+void FMouse::OnMouseMove(int32_t NewX, int32_t NewY) noexcept
 {
-    x = newX;
-    y = newY;
-    buffer.push(Mouse::Event(Mouse::Event::Type::Move, *this));
+    X = NewX;
+    Y = NewY;
+    EventBuffer.push(FMouse::FEvent(FMouse::FEvent::EType::Move, *this));
     TrimBuffer();
 }
 
-void Mouse::OnLeftPressed(int x, int y) noexcept
+void FMouse::OnLeftPressed() noexcept
 {
-    leftIsPressed = true;
-    buffer.push(Mouse::Event(Mouse::Event::Type::LeftPress, *this));
+    bLeftIsPressed = true;
+    EventBuffer.push(FMouse::FEvent(FMouse::FEvent::EType::LeftPress, *this));
     TrimBuffer();
 }
 
-void Mouse::OnLeftReleased(int x, int y) noexcept
+void FMouse::OnLeftReleased() noexcept
 {
-    leftIsPressed = false;
-    buffer.push(Mouse::Event(Mouse::Event::Type::LeftRelease, *this));
+    bLeftIsPressed = false;
+    EventBuffer.push(FMouse::FEvent(FMouse::FEvent::EType::LeftRelease, *this));
     TrimBuffer();
 }
 
-void Mouse::OnRightPressed(int x, int y) noexcept
+void FMouse::OnRightPressed() noexcept
 {
-    rightIsPressed = true;
-    buffer.push(Mouse::Event(Mouse::Event::Type::RightPress, *this));
+    bRightIsPressed = true;
+    EventBuffer.push(FMouse::FEvent(FMouse::FEvent::EType::RightPress, *this));
     TrimBuffer();
 }
 
-void Mouse::OnRightReleased(int x, int y) noexcept
+void FMouse::OnRightReleased() noexcept
 {
-    rightIsPressed = false;
-    buffer.push(Mouse::Event(Mouse::Event::Type::RightRelease, *this));
+    bRightIsPressed = false;
+    EventBuffer.push(FMouse::FEvent(FMouse::FEvent::EType::RightRelease, *this));
     TrimBuffer();
 }
 
-void Mouse::OnWheelUp(int x, int y) noexcept
+void FMouse::OnWheelUp() noexcept
 {
-    buffer.push(Mouse::Event(Mouse::Event::Type::WheelUp, *this));
+    EventBuffer.push(FMouse::FEvent(FMouse::FEvent::EType::WheelUp, *this));
     TrimBuffer();
 }
 
-void Mouse::OnWheelDown(int x, int y) noexcept
+void FMouse::OnWheelDown() noexcept
 {
-    buffer.push(Mouse::Event(Mouse::Event::Type::WheelDown, *this));
+    EventBuffer.push(FMouse::FEvent(FMouse::FEvent::EType::WheelDown, *this));
     TrimBuffer();
 }
 
-void Mouse::OnWheelDelta(int x, int y, int delta) noexcept
+void FMouse::OnWheelDelta(int32_t delta) noexcept
 {
-    wheelDeltaCarry += delta;
-    while (wheelDeltaCarry >= WHEEL_DELTA)
+    WheelDeltaCarry += delta;
+    while (WheelDeltaCarry >= WHEEL_DELTA)
     {
-        wheelDeltaCarry -= WHEEL_DELTA;
-        OnWheelUp(x, y);
+        WheelDeltaCarry -= WHEEL_DELTA;
+        OnWheelUp();
     }
-    while (wheelDeltaCarry <= -WHEEL_DELTA)
+    while (WheelDeltaCarry <= -WHEEL_DELTA)
     {
-        wheelDeltaCarry += WHEEL_DELTA;
-        OnWheelDown(x, y);
+        WheelDeltaCarry += WHEEL_DELTA;
+        OnWheelDown();
     }
 }
 
-void Mouse::OnMouseEnterWindow() noexcept
+void FMouse::OnMouseEnterWindow() noexcept
 {
-    isInWindow = true;
-    buffer.push(Mouse::Event(Mouse::Event::Type::EnterWindow, *this));
+    bIsInWindow = true;
+    EventBuffer.push(FMouse::FEvent(FMouse::FEvent::EType::EnterWindow, *this));
     TrimBuffer();
 }
 
-void Mouse::OnMouseLeaveWindow() noexcept
+void FMouse::OnMouseLeaveWindow() noexcept
 {
-    isInWindow = false;
-    buffer.push(Mouse::Event(Mouse::Event::Type::LeaveWindow, *this));
+    bIsInWindow = false;
+    EventBuffer.push(FMouse::FEvent(FMouse::FEvent::EType::LeaveWindow, *this));
     TrimBuffer();
 }
 
-void Mouse::TrimBuffer() noexcept
+void FMouse::TrimBuffer() noexcept
 {
-    while (buffer.size() > bufferSize)
+    while (EventBuffer.size() > BufferSize)
     {
-        buffer.pop();
+        EventBuffer.pop();
     }
 }

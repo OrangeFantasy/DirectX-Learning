@@ -2,15 +2,15 @@
 
 #include <queue>
 
-class Mouse
+class FMouse
 {
-    friend class Window;
+    friend class FWindow;
 
 public:
-    class Event
+    class FEvent
     {
     public:
-        enum class Type
+        enum class EType
         {
             LeftPress,
             LeftRelease,
@@ -25,71 +25,70 @@ public:
         };
 
     public:
-        Event() noexcept : type(Type::Invalid), leftIsPressed(false), rightIsPressed(false), x(0), y(0) {}
-        Event(Type _type, const Mouse& parent) noexcept
-            : type(_type), leftIsPressed(parent.leftIsPressed), rightIsPressed(parent.rightIsPressed), x(parent.x), y(parent.y)
-        {
-        }
+        FEvent() noexcept : Type(EType::Invalid), bLeftIsPressed(false), bRightIsPressed(false), X(0), Y(0) {}
+        FEvent(EType Ty, const FMouse& Parent) noexcept
+            : Type(Ty), bLeftIsPressed(Parent.bLeftIsPressed), bRightIsPressed(Parent.bRightIsPressed), X(Parent.X), Y(Parent.Y)
+        {}
 
-        bool LeftIsPress() const noexcept { return leftIsPressed; }
-        bool RightIsPress() const noexcept { return rightIsPressed; }
-        bool isValid() const noexcept { return type != Type::Invalid; }
-        Type GetType() const noexcept { return type; }
+        bool LeftIsPress() const noexcept { return bLeftIsPressed; }
+        bool RightIsPress() const noexcept { return bRightIsPressed; }
+        bool IsValid() const noexcept { return Type != EType::Invalid; }
+        EType GetType() const noexcept { return Type; }
 
-        std::pair<int, int> GetPos() const noexcept { return {x, y}; }
-
-        int GetPosX() const noexcept { return x; }
-        int GetPosY() const noexcept { return y; }
+        std::pair<int32_t, int32_t> GetPos() const noexcept { return {X, Y}; }
+        int32_t GetPosX() const noexcept { return X; }
+        int32_t GetPosY() const noexcept { return Y; }
 
     private:
-        Type type;
-        bool leftIsPressed;
-        bool rightIsPressed;
-        int  x;
-        int  y;
+        EType Type;
+
+        int32_t X;
+        int32_t Y;
+        bool bLeftIsPressed;
+        bool bRightIsPressed;
     };
 
 public:
-    Mouse()                        = default;
-    Mouse(const Mouse&)            = delete;
-    Mouse& operator=(const Mouse&) = delete;
+    FMouse()                         = default;
+    FMouse(const FMouse&)            = delete;
+    FMouse& operator=(const FMouse&) = delete;
+    ~FMouse()                        = default;
 
-    std::pair<int, int> GetPos() const noexcept;
-
-    int GetPosX() const noexcept;
-    int GetPosY() const noexcept;
+    std::pair<int32_t, int32_t> GetPos() const noexcept;
+    int32_t GetPosX() const noexcept;
+    int32_t GetPosY() const noexcept;
 
     bool LeftIsPress() const noexcept;
     bool RightIsPress() const noexcept;
     bool IsInWindow() const noexcept;
-
-    Mouse::Event Read() noexcept;
-
     bool IsEmpty() const noexcept;
+
+    FMouse::FEvent Read() noexcept;
     void Flush() noexcept;
 
 private:
-    void OnMouseMove(int x, int y) noexcept;
-    void OnLeftPressed(int x, int y) noexcept;
-    void OnLeftReleased(int x, int y) noexcept;
-    void OnRightPressed(int x, int y) noexcept;
-    void OnRightReleased(int x, int y) noexcept;
-    void OnWheelUp(int x, int y) noexcept;
-    void OnWheelDown(int x, int y) noexcept;
-    void OnWheelDelta(int x, int y, int delta) noexcept;
+    void OnMouseMove(int32_t NewX, int32_t NewY) noexcept;
+    void OnLeftPressed() noexcept;
+    void OnLeftReleased() noexcept;
+    void OnRightPressed() noexcept;
+    void OnRightReleased() noexcept;
+    void OnWheelUp() noexcept;
+    void OnWheelDown() noexcept;
+    void OnWheelDelta(int32_t Delta) noexcept;
     void OnMouseEnterWindow() noexcept;
     void OnMouseLeaveWindow() noexcept;
     void TrimBuffer() noexcept;
 
 private:
-    static constexpr unsigned int bufferSize = 16U;
+    static constexpr int32_t BufferSize = 16;
 
-    int  x;
-    int  y;
-    bool leftIsPressed   = false;
-    bool rightIsPressed  = false;
-    bool isInWindow      = false;
-    int  wheelDeltaCarry = 0;
+    int32_t X = 0;
+    int32_t Y = 0;
+    int32_t WheelDeltaCarry = 0;
 
-    std::queue<Event> buffer;
+    bool bLeftIsPressed  = false;
+    bool bRightIsPressed = false;
+    bool bIsInWindow     = false;
+
+    std::queue<FEvent> EventBuffer;
 };

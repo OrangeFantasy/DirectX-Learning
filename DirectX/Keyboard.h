@@ -3,15 +3,17 @@
 #include <queue>
 #include <bitset>
 
-class Keyboard
+#include "String.h"
+
+class FKeyboard
 {
-    friend class Window;
+    friend class FWindow;
 
 public:
-    class Event
+    class FEvent
     {
     public:
-        enum class Type
+        enum class EType
         {
             Press,
             Release,
@@ -19,33 +21,33 @@ public:
         };
 
     public:
-        Event() : type(Type::Invalid), code(0U) {}
-        Event(Type _type, unsigned char _code) : type(_type), code(_code) {}
+        FEvent() : Type(EType::Invalid), Code(0U) {}
+        FEvent(EType Ty, uint8_t Code) : Type(Ty), Code(Code) {}
 
-        bool IsPress() const noexcept { return type == Type::Press; }
-        bool IsRelease() const noexcept { return type == Type::Release; }
-        bool IsValid() const noexcept { return type != Type::Invalid; }
-
-        unsigned char GetCode() const noexcept { return code; }
+        bool IsPress() const noexcept { return Type == EType::Press; }
+        bool IsRelease() const noexcept { return Type == EType::Release; }
+        bool IsValid() const noexcept { return Type != EType::Invalid; }
+        uint8_t GetCode() const noexcept { return Code; }
 
     private:
-        Type          type;
-        unsigned char code;
+        EType Type;
+        uint8_t Code;
     };
 
 public:
-    Keyboard()                           = default;
-    Keyboard(const Keyboard&)            = delete;
-    Keyboard& operator=(const Keyboard&) = delete;
+    FKeyboard()                            = default;
+    FKeyboard(const FKeyboard&)            = delete;
+    FKeyboard& operator=(const FKeyboard&) = delete;
+    ~FKeyboard()                           = default;
 
     // Key event stuff.
-    bool  KeyIsPressed(unsigned char keycode) const noexcept;
-    Event ReadKey() noexcept;
-    bool  KeyIsEmpty() const noexcept;
-    void  FlushKey() noexcept;
+    bool KeyIsPressed(uint8_t Keycode) const noexcept;
+    FEvent ReadKey() noexcept;
+    bool KeyIsEmpty() const noexcept;
+    void FlushKey() noexcept;
 
     // Char event stuff.
-    char ReadChar() noexcept;
+    FChar ReadChar() noexcept;
     bool CharIsEmpty() const noexcept;
     void FlushChar() noexcept;
     void Flush() noexcept;
@@ -56,30 +58,30 @@ public:
     bool AutorepeatIsEnable() const noexcept;
 
 private:
-    void OnKeyPressed(unsigned char keycode) noexcept;
-    void OnKeyReleased(unsigned char keycode) noexcept;
-    void OnChar(char character) noexcept;
+    void OnKeyPressed(uint8_t Keycode) noexcept;
+    void OnKeyReleased(uint8_t Keycode) noexcept;
+    void OnChar(FChar Character) noexcept;
     void ClearState() noexcept;
 
     template <typename T>
-    static void TrimBuffer(std::queue<T>& buffer) noexcept;
+    static void TrimBuffer(std::queue<T>& Buffer) noexcept;
 
 private:
-    static constexpr unsigned int nKeys      = 256U;
-    static constexpr unsigned int bufferSize = 16U;
+    static constexpr unsigned int NumKeys      = 256U;
+    static constexpr unsigned int BufferSize = 16U;
 
-    bool autorepeatEnabled = false;
+    bool bAutorepeatEnabled = false;
 
-    std::bitset<nKeys> keyStates;
-    std::queue<Event>  keyBuffer;
-    std::queue<char>   charBuffer;
+    std::bitset<NumKeys> KeyStates;
+    std::queue<FEvent>   KeyBuffer;
+    std::queue<FChar>    CharBuffer;
 };
 
 template <typename T>
-inline void Keyboard::TrimBuffer(std::queue<T>& buffer) noexcept
+inline void FKeyboard::TrimBuffer(std::queue<T>& Buffer) noexcept
 {
-    while (buffer.size() > bufferSize)
+    while (Buffer.size() > BufferSize)
     {
-        buffer.pop();
+        Buffer.pop();
     }
 }

@@ -4,121 +4,166 @@
 
 #include "resource.h"
 
-Window::WindowClass Window::WindowClass::wndClass;
+// Error exception macro.
+#define HWND_EXCEPT(Result) FWindow::FWindowException(__LINE__, TEXT(__FILE__), Result)
+#define HWND_LAST_EXCEPT() FWindow::FWindowException(__LINE__, TEXT(__FILE__), GetLastError())
 
-Window::WindowClass::WindowClass() noexcept : hInstance(GetModuleHandle(nullptr))
+FWindow::FWindowClass FWindow::FWindowClass::WindowClass;
+
+FWindow::FWindowClass::FWindowClass() noexcept : Instance(GetModuleHandle(nullptr))
 {
-    WNDCLASSEX wc    = {0};
-    wc.cbSize        = sizeof(wc);
-    wc.style         = CS_OWNDC;
-    wc.lpfnWndProc   = HandleMsgSetup;
-    wc.cbClsExtra    = 0;
-    wc.cbWndExtra    = 0;
-    wc.hInstance     = GetInstance();
-    wc.hIcon         = LoadIcon(GetInstance(), MAKEINTRESOURCE(IDI_ICON1));
-    wc.hCursor       = nullptr;
-    wc.hbrBackground = nullptr;
-    wc.lpszMenuName  = nullptr;
-    wc.lpszClassName = GetName();
-    wc.hIconSm       = nullptr;
+    WNDCLASSEX WndClass    = {0};
+    WndClass.cbSize        = sizeof(WndClass);
+    WndClass.style         = CS_OWNDC;
+    WndClass.lpfnWndProc   = HandleMsgSetup;
+    WndClass.cbClsExtra    = 0;
+    WndClass.cbWndExtra    = 0;
+    WndClass.hInstance     = GetInstance();
+    WndClass.hIcon         = LoadIcon(GetInstance(), MAKEINTRESOURCE(IDI_ICON1));
+    WndClass.hCursor       = nullptr;
+    WndClass.hbrBackground = nullptr;
+    WndClass.lpszMenuName  = nullptr;
+    WndClass.lpszClassName = GetName();
+    WndClass.hIconSm       = nullptr;
 
-    RegisterClassEx(&wc);
+    RegisterClassEx(&WndClass);
 }
 
-Window::WindowClass::~WindowClass()
+FWindow::FWindowClass::~FWindowClass()
 {
-    UnregisterClass(wndClassName, GetInstance());
+    UnregisterClass(WindowClassName, GetInstance());
 }
 
-const char_t* Window::WindowClass::GetName() noexcept
+const FChar* FWindow::FWindowClass::GetName() noexcept
 {
-    return wndClassName;
+    return WindowClassName;
 }
 
-HINSTANCE Window::WindowClass::GetInstance() noexcept
+HINSTANCE FWindow::FWindowClass::GetInstance() noexcept
 {
-    return wndClass.hInstance;
+    return WindowClass.Instance;
 }
 
-Window::Window(int nWidth, int nHeight, const char_t* wndName) : width(nWidth), height(nHeight)
+FWindow::FWindow(int32_t Width, int32_t Height, const FChar* WindowName) : Width(Width), Height(Height)
 {
     // Calculate window size based on desired client region size
-    RECT wr   = {};
-    wr.left   = 100;
-    wr.right  = width + wr.left;
-    wr.top    = 100;
-    wr.bottom = height + wr.top;
-    if (!AdjustWindowRectEx(&wr, WS_CAPTION | WS_MINIMIZEBOX | WS_SYSMENU, FALSE, 0))
+    RECT WindowRect   = {};
+    WindowRect.left   = 100;
+    WindowRect.right  = Width + WindowRect.left;
+    WindowRect.top    = 100;
+    WindowRect.bottom = Height + WindowRect.top;
+    if (!AdjustWindowRectEx(&WindowRect, WS_CAPTION | WS_MINIMIZEBOX | WS_SYSMENU, FALSE, 0))
     {
-        throw HWND_LAST_EXCEPT();
+        throw WIN32_LAST_EXCEPT();
     }
 
     // Create window & Get hWnd
-    hWnd = CreateWindow(WindowClass::GetName(),   //
-        wndName,                                  //
-        WS_CAPTION | WS_MINIMIZEBOX | WS_SYSMENU, //
-        CW_USEDEFAULT,                            //
-        CW_USEDEFAULT,                            //
-        wr.right - wr.left,                       //
-        wr.bottom - wr.top,                       //
-        nullptr,                                  //
-        nullptr,                                  //
-        WindowClass::GetInstance(),               //
-        this);
-    if (hWnd == nullptr)
+    WindowHandle = CreateWindow(FWindowClass::GetName(), //
+        WindowName,                                      //
+        WS_CAPTION | WS_MINIMIZEBOX | WS_SYSMENU,        //
+        CW_USEDEFAULT,                                   //
+        CW_USEDEFAULT,                                   //
+        WindowRect.right - WindowRect.left,              //
+        WindowRect.bottom - WindowRect.top,              //
+        nullptr,                                         //
+        nullptr,                                         //
+        FWindowClass::GetInstance(),                     //
+        this                                             //
+    );
+    if (WindowHandle == nullptr)
     {
-        throw HWND_LAST_EXCEPT();
+        throw WIN32_LAST_EXCEPT();
     }
 
     // Show window.
-    ShowWindow(hWnd, SW_SHOW);
+    ShowWindow(WindowHandle, SW_SHOW);
+
+    // Create graphics object;
+    GraphicsPtr = new FGraphics(WindowHandle);
 }
 
-Window::~Window()
+FWindow::~FWindow()
 {
-    DestroyWindow(hWnd);
-}
-
-void Window::SetTitle(const string_t title)
-{
-    if (SetWindowText(hWnd, title.c_str()) == 0)
+    if (GraphicsPtr != nullptr)
     {
-        throw HWND_LAST_EXCEPT();
+        delete GraphicsPtr;
+        GraphicsPtr = nullptr;
+    }
+
+    DestroyWindow(WindowHandle);
+}
+
+std::optional<int32_t> FWindow::ProcessMessages()
+{
+    MSG Msg;
+
+    // While queue has messages, remove and dispatch them (but do not block on empty queue).
+    while (PeekMessage(&Msg, nullptr, 0, 0, PM_REMOVE))
+    {
+        // Check for quit because peekmessage does not signal this via return val.
+        if (Msg.message == WM_QUIT)
+        {
+            return (int32_t)Msg.wParam;
+        }
+
+        // TranslateMessage will post auxilliary WM_CHAR messages from key msgs.
+        TranslateMessage(&Msg);
+        DispatchMessage(&Msg);
+    }
+
+    // return empty optional when not quitting app.
+    return std::optional<int32_t>();
+}
+
+void FWindow::SetTitle(const FString Title)
+{
+    if (SetWindowText(WindowHandle, Title.c_str()) == 0)
+    {
+        throw WIN32_LAST_EXCEPT();
     }
 }
 
-LRESULT WINAPI Window::HandleMsgSetup(_In_ HWND hWnd, _In_ UINT Msg, _In_ WPARAM wParam, _In_ LPARAM lParam) noexcept
+FGraphics& FWindow::Graphics()
+{
+    if (GraphicsPtr == nullptr)
+    {
+        throw NO_GRAPHICS_EXCEPT();
+    }
+    return *GraphicsPtr;
+}
+
+LRESULT WINAPI FWindow::HandleMsgSetup(_In_ HWND HWnd, _In_ UINT Msg, _In_ WPARAM WParam, _In_ LPARAM LParam) noexcept
 {
     // Use create parameter passed in from CreateWindow() to store window class pointer.
     if (Msg == WM_NCCREATE)
     {
         // Extract ptr to window class from creation data.
-        const CREATESTRUCT* pCreate = reinterpret_cast<CREATESTRUCT*>(lParam);
-        Window*             pWnd    = static_cast<Window*>(pCreate->lpCreateParams);
+        const CREATESTRUCT* pCreate = reinterpret_cast<CREATESTRUCT*>(LParam);
+        FWindow*            pWnd    = static_cast<FWindow*>(pCreate->lpCreateParams);
 
         // Set WinAPI-managed user data to store ptr to window class.
-        SetWindowLongPtr(hWnd, GWLP_USERDATA, reinterpret_cast<LONG_PTR>(pWnd));
+        SetWindowLongPtr(HWnd, GWLP_USERDATA, reinterpret_cast<LONG_PTR>(pWnd));
 
         // Set message proc to normal (non-setup) handler now that setup is finished.
-        SetWindowLongPtr(hWnd, GWLP_WNDPROC, reinterpret_cast<LONG_PTR>(&Window::HandleMsgThunk));
+        SetWindowLongPtr(HWnd, GWLP_WNDPROC, reinterpret_cast<LONG_PTR>(&FWindow::HandleMsgThunk));
 
         // Forward message to window class handler.
-        return pWnd->HandleMsg(hWnd, Msg, wParam, lParam);
+        return pWnd->HandleMsg(HWnd, Msg, WParam, LParam);
     }
     // If we get a messgae before the WM_NCCREATE message, handle with default handler.
-    return DefWindowProc(hWnd, Msg, wParam, lParam);
+    return DefWindowProc(HWnd, Msg, WParam, LParam);
 }
 
-LRESULT WINAPI Window::HandleMsgThunk(_In_ HWND hWnd, _In_ UINT Msg, _In_ WPARAM wParam, _In_ LPARAM lParam) noexcept
+LRESULT WINAPI FWindow::HandleMsgThunk(_In_ HWND HWnd, _In_ UINT Msg, _In_ WPARAM WParam, _In_ LPARAM LParam) noexcept
 {
     // Retrieve ptr to window class.
-    Window* pWnd = reinterpret_cast<Window*>(GetWindowLongPtr(hWnd, GWLP_USERDATA));
+    FWindow* WindowPtr = reinterpret_cast<FWindow*>(GetWindowLongPtr(HWnd, GWLP_USERDATA));
 
     // Forward message to window class handler.
-    return pWnd->HandleMsg(hWnd, Msg, wParam, lParam);
+    return WindowPtr->HandleMsg(HWnd, Msg, WParam, LParam);
 }
 
-LRESULT Window::HandleMsg(HWND hWnd, UINT Msg, WPARAM wParam, LPARAM lParam) noexcept
+LRESULT FWindow::HandleMsg(HWND HWnd, UINT Msg, WPARAM WParam, LPARAM LParam) noexcept
 {
     switch (Msg)
     {
@@ -127,141 +172,80 @@ LRESULT Window::HandleMsg(HWND hWnd, UINT Msg, WPARAM wParam, LPARAM lParam) noe
         return 0;
 
     case WM_KILLFOCUS:
-        keyboard.ClearState();
+        Keyboard.ClearState();
         break;
     case WM_KEYDOWN:
     case WM_SYSKEYDOWN:
-        if (!(lParam & 0x40000000) || keyboard.AutorepeatIsEnable())
+        if (!(LParam & 0x40000000) || Keyboard.AutorepeatIsEnable())
         {
-            keyboard.OnKeyPressed(static_cast<unsigned char>(wParam));
+            Keyboard.OnKeyPressed(static_cast<uint8_t>(WParam));
         }
         break;
     case WM_KEYUP:
     case WM_SYSKEYUP:
-        keyboard.OnKeyReleased(static_cast<unsigned char>(wParam));
+        Keyboard.OnKeyReleased(static_cast<uint8_t>(WParam));
         break;
     case WM_CHAR:
-        keyboard.OnChar(static_cast<unsigned char>(wParam));
+        Keyboard.OnChar(static_cast<FChar>(WParam));
         break;
 
     case WM_MOUSEMOVE:
     {
-        POINTS pt = MAKEPOINTS(lParam);
+        POINTS Point = MAKEPOINTS(LParam);
         // In window.
-        if (pt.x >= 0 && pt.x < width && pt.y > 0 && pt.y < height)
+        if (Point.x >= 0 && Point.x < Width && Point.y > 0 && Point.y < Height)
         {
-            mouse.OnMouseMove(pt.x, pt.y);
-            if (!mouse.IsInWindow())
+            Mouse.OnMouseMove(Point.x, Point.y);
+            if (!Mouse.IsInWindow())
             {
-                SetCapture(hWnd);
-                mouse.OnMouseEnterWindow();
+                SetCapture(HWnd);
+                Mouse.OnMouseEnterWindow();
             }
         }
         // Not in window -> log move/maintain capture if button down.
         else
         {
-            if (wParam & (MK_LBUTTON | MK_RBUTTON))
+            if (WParam & (MK_LBUTTON | MK_RBUTTON))
             {
-                mouse.OnMouseMove(pt.x, pt.y);
+                Mouse.OnMouseMove(Point.x, Point.y);
             }
             else
             {
                 ReleaseCapture();
-                mouse.OnMouseLeaveWindow();
+                Mouse.OnMouseLeaveWindow();
             }
         }
         break;
     }
     case WM_LBUTTONDOWN:
     {
-        POINTS pt = MAKEPOINTS(lParam);
-        mouse.OnLeftPressed(pt.x, pt.y);
+        Mouse.OnLeftPressed();
         break;
     }
     case WM_LBUTTONUP:
     {
-        POINTS pt = MAKEPOINTS(lParam);
-        mouse.OnLeftReleased(pt.x, pt.y);
+        Mouse.OnLeftReleased();
         break;
     }
     case WM_RBUTTONDOWN:
     {
-        POINTS pt = MAKEPOINTS(lParam);
-        mouse.OnRightPressed(pt.x, pt.y);
+        Mouse.OnRightPressed();
         break;
     }
     case WM_RBUTTONUP:
     {
-        POINTS pt = MAKEPOINTS(lParam);
-        mouse.OnRightReleased(pt.x, pt.y);
+        Mouse.OnRightReleased();
         break;
     }
     case WM_MOUSEWHEEL:
     {
-        POINTS pt    = MAKEPOINTS(lParam);
-        int    delta = GET_WHEEL_DELTA_WPARAM(wParam);
-        mouse.OnWheelDelta(pt.x, pt.y, delta);
+        int32_t Delta = GET_WHEEL_DELTA_WPARAM(WParam);
+        Mouse.OnWheelDelta(Delta);
         break;
     }
 
     default:
         break;
     }
-    return DefWindowProc(hWnd, Msg, wParam, lParam);
-}
-
-Window::Exception::Exception(int line, const char_t* file, HRESULT hResult) noexcept : OraeException(line, file), hResult(hResult) {}
-
-const char_t* Window::Exception::What() const noexcept
-{
-#ifdef UNICODE
-    std::wostringstream oss;
-    oss << GetType() << "\n"
-        << "[Error Code] " << GetErrorCode() << "\n"
-        << "[Desription] " << GetErrorString() << "\n"
-        << GetOriginString();
-#elif
-    std::ostringstream oss;
-    oss << GetType() << L"\n"
-        << L"[Error Code] " << GetErrorCode() << L"\n"
-        << L"[Desription] " << GetErrorString() << L"\n"
-        << GetOriginString();
-#endif
-
-    whatBuffer = oss.str();
-    return whatBuffer.c_str();
-}
-
-const char_t* Window::Exception::GetType() const noexcept
-{
-    return TEXT("Orae Window Exception");
-}
-
-HRESULT Window::Exception::GetErrorCode() const noexcept
-{
-    return hResult;
-}
-
-string_t Window::Exception::GetErrorString() const noexcept
-{
-    return TranslateErrorCode(hResult);
-}
-
-string_t Window::Exception::TranslateErrorCode(HRESULT hResult)
-{
-    char_t* pMsgBuffer = nullptr;
-    DWORD   nMsgLen    = FormatMessage(FORMAT_MESSAGE_ALLOCATE_BUFFER | FORMAT_MESSAGE_FROM_SYSTEM | FORMAT_MESSAGE_IGNORE_INSERTS, //
-             nullptr,                                                                                                               //
-             hResult,                                                                                                               //
-             MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT),                                                                             //
-             reinterpret_cast<LPWSTR>(&pMsgBuffer),                                                                                 //
-             0,                                                                                                                     //
-             nullptr);
-    if (nMsgLen == 0)
-    {
-        return TEXT("Unidentfied error code");
-    }
-    string_t errorString = pMsgBuffer;
-    LocalFree(pMsgBuffer);
-    return errorString;
+    return DefWindowProc(HWnd, Msg, WParam, LParam);
 }
