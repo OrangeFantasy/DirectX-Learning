@@ -21,7 +21,7 @@ public:
     void EndFrame();
     void ClearBuffer(float red, float green, float blue) noexcept;
 
-    void DrawTestTriangle();
+    void DrawTestTriangle(float Angle);
 
 private:
     ComPtr<ID3D11Device>           Device        = nullptr;
