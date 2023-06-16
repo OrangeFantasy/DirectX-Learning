@@ -39,6 +39,9 @@
 #define NOIMAGE
 #define NOTAPE
 
+#ifndef STRICT
 #define STRICT
+#endif // !STRICT
+
 
 #include <Windows.h>

@@ -21,6 +21,12 @@
     <Filter Include="Source\Managers">
       <UniqueIdentifier>{a3e32843-3ee7-4058-ac28-5e4e3bbacbb0}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Source\Resources">
+      <UniqueIdentifier>{bff97360-df6b-4f63-8bcd-ddc3542233f5}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source\Shader">
+      <UniqueIdentifier>{5062b9c9-5273-47c9-818a-9ad4f38cf5fd}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="WinMain.cpp">
@@ -73,9 +79,6 @@
     <ClInclude Include="Window.h">
       <Filter>Source</Filter>
     </ClInclude>
-    <ClInclude Include="resource.h">
-      <Filter>Source</Filter>
-    </ClInclude>
     <ClInclude Include="App.h">
       <Filter>Source</Filter>
     </ClInclude>
@@ -109,6 +112,9 @@
     <ClInclude Include="Direct3DException.h">
       <Filter>Source\Exceptions</Filter>
     </ClInclude>
+    <ClInclude Include="resource.h">
+      <Filter>Source\Resources</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="DirectX.rc">
@@ -128,5 +134,13 @@
     <Image Include="..\..\..\..\_Image\favicon.ico">
       <Filter>资源文件</Filter>
     </Image>
+  </ItemGroup>
+  <ItemGroup>
+    <FxCompile Include="Shader\VertexShader.hlsl">
+      <Filter>Source\Shader</Filter>
+    </FxCompile>
+    <FxCompile Include="Shader\PixelShader.hlsl">
+      <Filter>Source\Shader</Filter>
+    </FxCompile>
   </ItemGroup>
 </Project>

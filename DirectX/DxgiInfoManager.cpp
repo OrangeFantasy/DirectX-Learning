@@ -1,8 +1,6 @@
 #include "DxgiInfoManager.h"
 #include "Direct3DException.h"
 
-#include <dxgidebug.h>
-
 #pragma comment(lib, "dxguid.lib")
 
 FDxgiInfoManager::FDxgiInfoManager()
@@ -25,15 +23,7 @@ FDxgiInfoManager::FDxgiInfoManager()
         throw WIN32_LAST_EXCEPT();
     }
 
-    D3D_CHECK_FAILED_NOINFO(DxgiGetDebugInference(__uuidof(IDXGIInfoQueue), reinterpret_cast<void**>(&DxgiInfoQueue)));
-}
-
-FDxgiInfoManager::~FDxgiInfoManager()
-{
-    if (DxgiInfoQueue != nullptr)
-    {
-        DxgiInfoQueue->Release();
-    }
+    D3D_CHECK_FAILED_NOINFO(DxgiGetDebugInference(__uuidof(IDXGIInfoQueue), &DxgiInfoQueue));
 }
 
 void FDxgiInfoManager::Set() noexcept

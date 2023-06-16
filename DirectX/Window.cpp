@@ -46,7 +46,7 @@ HINSTANCE FWindow::FWindowClass::GetInstance() noexcept
 
 FWindow::FWindow(int32_t Width, int32_t Height, const FChar* WindowName) : Width(Width), Height(Height)
 {
-    // Calculate window size based on desired client region size
+    // Calculate window size based on desired client region size.
     RECT WindowRect   = {};
     WindowRect.left   = 100;
     WindowRect.right  = Width + WindowRect.left;
@@ -57,7 +57,7 @@ FWindow::FWindow(int32_t Width, int32_t Height, const FChar* WindowName) : Width
         throw WIN32_LAST_EXCEPT();
     }
 
-    // Create window & Get hWnd
+    // Create window & Get hWnd.
     WindowHandle = CreateWindow(FWindowClass::GetName(), //
         WindowName,                                      //
         WS_CAPTION | WS_MINIMIZEBOX | WS_SYSMENU,        //
@@ -75,11 +75,11 @@ FWindow::FWindow(int32_t Width, int32_t Height, const FChar* WindowName) : Width
         throw WIN32_LAST_EXCEPT();
     }
 
-    // Show window.
-    ShowWindow(WindowHandle, SW_SHOW);
-
     // Create graphics object;
     GraphicsPtr = new FGraphics(WindowHandle);
+
+    // Show window.
+    ShowWindow(WindowHandle, SW_SHOW);
 }
 
 FWindow::~FWindow()

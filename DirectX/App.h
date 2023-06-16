@@ -7,6 +7,7 @@ class App
 {
 public:
     App();
+    ~App() = default;
 
     int32_t Run();
 

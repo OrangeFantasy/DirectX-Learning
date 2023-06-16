@@ -6,10 +6,10 @@ int32_t App::Run()
 {
     while (true)
     {
-        if (std::optional<int32_t> errCode = FWindow::ProcessMessages())
+        if (std::optional<int32_t> ErrorCode = FWindow::ProcessMessages())
         {
             // Quit or Error.
-            return *errCode;
+            return *ErrorCode;
         }
         Tick();
     }
@@ -19,7 +19,7 @@ void App::Tick(float Delta)
 {
     float c = std::sin(Timer.Peek()) / 2.0f + 0.5f;
     Window.Graphics().ClearBuffer(c, c, 1.0f);
-
+    Window.Graphics().DrawTestTriangle();
     Window.Graphics().EndFrame();
     std::this_thread::sleep_for(std::chrono::milliseconds(50));
 }
